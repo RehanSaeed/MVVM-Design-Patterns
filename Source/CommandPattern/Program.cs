@@ -15,50 +15,55 @@ namespace CommandPattern
             container.Register<IService1, Service1>();
             container.Register<IService2, Service2>();
             container.Register<IService3, Service3>();
-            container.Register<SomeViewModel>();
+
+            container.Register<FirstViewModel>();
+            await FirstUsage.Execute(container);
+
             container.Register<GreetingCommand>();
-            container.Register<OtherViewModel>();
+            container.Register<SecondViewModel>();
+            SecondUsage.Execute(container);
 
-            var someViewModel = container.Resolve<SomeViewModel>();
-
-            if (someViewModel.NoParameterCommand.CanExecute())
-            {
-                someViewModel.NoParameterCommand.Execute();
-            }
-
-            if (someViewModel.HasParameterCommand.CanExecute("Hi"))
-            {
-                someViewModel.HasParameterCommand.Execute("Hi");
-            }
-
-            if (someViewModel.NoParameterAsyncCommand.CanExecute())
-            {
-                await someViewModel.NoParameterAsyncCommand.Execute();
-            }
-
-            if (someViewModel.HasParameterAsyncCommand.CanExecute("Hi"))
-            {
-                await someViewModel.HasParameterAsyncCommand.Execute("Hi");
-            }
-
-            var otherViewModel = container.Resolve<OtherViewModel>();
-            if (otherViewModel.GreetingCommand.CanExecute("Foo"))
-            {
-                // This should never execute
-            }
-
-            if (otherViewModel.GreetingCommand.CanExecute("Hello"))
-            {
-                otherViewModel.GreetingCommand.Execute("Hello");
-            }
+            container.Register<DoStuffOnTheViewModelCommand>();
+            container.Register<ThirdViewModel>();
+            ThirdUsage.Execute(container);
 
             Console.Read();
         }
     }
 
-    public class SomeViewModel : NotifyPropertyChanges
+    #region First
+
+    public static class FirstUsage
     {
-        public SomeViewModel()
+        public static async Task Execute(Container container)
+        {
+            var firstViewModel = container.Resolve<FirstViewModel>();
+
+            if (firstViewModel.NoParameterCommand.CanExecute())
+            {
+                firstViewModel.NoParameterCommand.Execute();
+            }
+
+            if (firstViewModel.HasParameterCommand.CanExecute("Hi"))
+            {
+                firstViewModel.HasParameterCommand.Execute("Hi");
+            }
+
+            if (firstViewModel.NoParameterAsyncCommand.CanExecute())
+            {
+                await firstViewModel.NoParameterAsyncCommand.Execute();
+            }
+
+            if (firstViewModel.HasParameterAsyncCommand.CanExecute("Hi"))
+            {
+                await firstViewModel.HasParameterAsyncCommand.Execute("Hi");
+            }
+        }
+    }
+
+    public class FirstViewModel : NotifyPropertyChanges
+    {
+        public FirstViewModel()
         {
             this.NoParameterCommand = new DelegateCommand(this.NoParameter);
             this.HasParameterCommand = new DelegateCommand<string>(this.HasParameter);
@@ -91,29 +96,32 @@ namespace CommandPattern
         }
     }
 
-    public class GreetingCommand : Command<string>
+    #endregion
+
+    #region Second
+
+    public static class SecondUsage
     {
-        private readonly IService1 service1;
+        public static void Execute(Container container)
+        {
+            var secondViewModel = container.Resolve<SecondViewModel>();
+            if (secondViewModel.GreetingCommand.CanExecute("Foo"))
+            {
+                // This should never execute
+            }
 
-        public GreetingCommand(IService1 service1) => this.service1 = service1;
-
-        // returning false from CanExecute can cause a control's IsEnabled property to be set to false.
-        // You can use this behaviour to do other things like hide the control:
-        // <Style.Triggers>
-        //     <Trigger Property = "IsEnabled" Value="False">
-        //         <Setter Property="Visibility" Value="Collapsed"/>
-        //     </Trigger>
-        // </Style.Triggers>
-        public override bool CanExecute(string parameter) => parameter.Contains("H");
-
-        public override void Execute(string greeting) => Console.WriteLine(greeting);
+            if (secondViewModel.GreetingCommand.CanExecute("Hello"))
+            {
+                secondViewModel.GreetingCommand.Execute("Hello");
+            }
+        }
     }
 
-    public class OtherViewModel : NotifyPropertyChanges
+    public class SecondViewModel : NotifyPropertyChanges
     {
         private readonly IService2 service2;
 
-        public OtherViewModel(
+        public SecondViewModel(
             GreetingCommand greetingCommand,
             IService2 service2)
         {
@@ -121,6 +129,81 @@ namespace CommandPattern
             this.service2 = service2;
         }
 
+        // returning false from CanExecute can cause a control's IsEnabled property to be set to false.
+        // You can use this behaviour to do other things like hide the control:
+        // <Button Command="{Binding GreetingCommand}">
+        //     <Button.Style>
+        //         <Style TargetType="Button">
+        //             <Style.Triggers>
+        //                 <Trigger Property="IsEnabled" Value="False">
+        //                     <Setter Property="Visibility" Value="Collapsed"/>
+        //                 </Trigger>
+        //             </Style.Triggers>
+        //         </Style>
+        //     </Button.Style>
+        // </Button>
         public GreetingCommand GreetingCommand { get; }
     }
+
+    public class GreetingCommand : Command<string>
+    {
+        private readonly IService1 service1;
+
+        public GreetingCommand(IService1 service1) => this.service1 = service1;
+
+        public override bool CanExecute(string parameter) => parameter.Contains("H");
+
+        public override void Execute(string greeting) => Console.WriteLine(greeting);
+    }
+
+    #endregion
+
+    #region Third
+
+    public static class ThirdUsage
+    {
+        public static void Execute(Container container)
+        {
+            var thirdViewModel = container.Resolve<ThirdViewModel>();
+            if (thirdViewModel.DoStuffOnTheViewModelCommand.CanExecute(thirdViewModel))
+            {
+                thirdViewModel.DoStuffOnTheViewModelCommand.Execute(thirdViewModel);
+            }
+        }
+    }
+
+    public class ThirdViewModel : NotifyPropertyChanges
+    {
+        private readonly IService3 service3;
+        private string text;
+
+        public ThirdViewModel(
+            DoStuffOnTheViewModelCommand doStuffOnTheViewModelCommand,
+            IService3 service3)
+        {
+            this.DoStuffOnTheViewModelCommand = doStuffOnTheViewModelCommand;
+            this.service3 = service3;
+        }
+
+        // <Button Command="{Binding DoStuffOnTheViewModelCommand}"
+        //         CommandParameter="{Binding}"/>
+        public DoStuffOnTheViewModelCommand DoStuffOnTheViewModelCommand { get; }
+
+        public string Text
+        {
+            get => this.text;
+            set => this.SetProperty(ref this.text, value);
+        }
+    }
+
+    public class DoStuffOnTheViewModelCommand : Command<ThirdViewModel>
+    {
+        private readonly IService1 service1;
+
+        public DoStuffOnTheViewModelCommand(IService1 service1) => this.service1 = service1;
+
+        public override void Execute(ThirdViewModel otherViewModel) => otherViewModel.Text = "Hello World";
+    }
+
+    #endregion
 }

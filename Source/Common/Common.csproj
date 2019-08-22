@@ -4,4 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup Label="Package References">
+    <PackageReference Include="System.Reactive" Version="4.1.6" />
+  </ItemGroup>
+
 </Project>
