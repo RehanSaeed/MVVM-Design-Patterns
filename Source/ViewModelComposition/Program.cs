@@ -1,13 +1,14 @@
-﻿using Common;
-using DryIoc;
-using System;
-using System.Collections.ObjectModel;
-
 namespace ViewModelComposition
 {
-    class Program
+    using Common;
+    using Common.Services;
+    using DryIoc;
+    using System;
+    using System.Collections.ObjectModel;
+
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main()
         {
             var container = new Container(rules => rules.WithoutThrowOnRegisteringDisposableTransient());
             container.Register<IService1, Service1>();
@@ -24,7 +25,7 @@ namespace ViewModelComposition
         }
     }
 
-    public class ConversationViewModel
+    public class ConversationViewModel : NotifyPropertyChanges
     {
         private readonly Func<MessageViewModel> messageViewModelFactory;
         private readonly IService1 service1;
@@ -59,10 +60,7 @@ namespace ViewModelComposition
 
         private string text;
 
-        public TextViewModel(IService2 service2)
-        {
-            this.service2 = service2;
-        }
+        public TextViewModel(IService2 service2) => this.service2 = service2;
 
         public string Text
         {
@@ -77,10 +75,7 @@ namespace ViewModelComposition
 
         private string text;
 
-        public MessageViewModel(IService3 service3)
-        {
-            this.service3 = service3;
-        }
+        public MessageViewModel(IService3 service3) => this.service3 = service3;
 
         public string Text
         {
