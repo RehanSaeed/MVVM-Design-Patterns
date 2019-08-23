@@ -1,10 +1,10 @@
 namespace ViewModelComposition
 {
+    using System;
+    using System.Collections.ObjectModel;
     using Common;
     using Common.Services;
     using DryIoc;
-    using System;
-    using System.Collections.ObjectModel;
 
     public class Program
     {
