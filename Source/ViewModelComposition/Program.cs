@@ -19,7 +19,7 @@ namespace ViewModelComposition
             container.Register<ConversationViewModel>();
 
             var conversationViewModel = container.Resolve<ConversationViewModel>();
-            conversationViewModel.AddMessage();
+            conversationViewModel.AddMessage("Hello World");
 
             Console.Read();
         }
@@ -46,10 +46,10 @@ namespace ViewModelComposition
 
         public TextViewModel Text { get; }
 
-        public void AddMessage()
+        public void AddMessage(string text)
         {
             var messageViewModel = this.messageViewModelFactory();
-            messageViewModel.Text = "Hello World";
+            messageViewModel.Text = text;
             this.Messages.Add(messageViewModel);
         }
     }
