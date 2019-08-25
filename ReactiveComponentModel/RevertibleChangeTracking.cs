@@ -1,9 +1,9 @@
-namespace Common
-{
-    using System;
-    using System.ComponentModel;
-    using System.Runtime.CompilerServices;
+using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
+namespace ReactiveComponentModel
+{
     /// <summary>
     /// Provides support for rolling back changes made to this objects properties. This object
     /// automatically saves its state before it is changed. Also provides errors for the object if
@@ -25,11 +25,11 @@ namespace Common
         /// </returns>
         public bool IsChangeTrackingEnabled
         {
-            get => this.isChangeTrackingEnabled;
+            get => isChangeTrackingEnabled;
             set
             {
                 base.OnPropertyChanging("IsChangeTrackingEnabled");
-                this.isChangeTrackingEnabled = value;
+                isChangeTrackingEnabled = value;
                 base.OnPropertyChanged("IsChangeTrackingEnabled");
             }
         }
@@ -42,12 +42,12 @@ namespace Common
         /// </returns>
         public bool IsChanged
         {
-            get => this.isChanged;
+            get => isChanged;
 
             private set
             {
                 base.OnPropertyChanging("IsChanged");
-                this.isChanged = value;
+                isChanged = value;
                 base.OnPropertyChanged("IsChanged");
             }
         }
@@ -58,8 +58,8 @@ namespace Common
         /// <value><c>true</c> if this instance is new; otherwise, <c>false</c>.</value>
         public bool IsNew
         {
-            get => this.isNew;
-            private set => this.SetProperty(ref this.isNew, value);
+            get => isNew;
+            private set => SetProperty(ref isNew, value);
         }
 
         /// <summary>
@@ -67,16 +67,16 @@ namespace Common
         /// </summary>
         public virtual void AcceptChanges()
         {
-            if (this.IsNew)
+            if (IsNew)
             {
-                this.IsNew = false;
-                this.IsChangeTrackingEnabled = true;
+                IsNew = false;
+                IsChangeTrackingEnabled = true;
             }
-            else if (this.IsChanged)
+            else if (IsChanged)
             {
-                this.EndEdit();
+                EndEdit();
 
-                this.IsChanged = false;
+                IsChanged = false;
             }
         }
 
@@ -87,7 +87,7 @@ namespace Common
         {
             base.CancelEdit();
 
-            this.IsChanged = false;
+            IsChanged = false;
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace Common
         /// <summary>
         /// Resets the object’s state to unchanged by rejecting the modifications.
         /// </summary>
-        public virtual void RejectChanges() => this.CancelEdit();
+        public virtual void RejectChanges() => CancelEdit();
 
         /// <summary>
         /// Raises the PropertyChanged event.
@@ -112,15 +112,15 @@ namespace Common
         {
             base.OnPropertyChanged(propertyName);
 
-            if (this.IsChangeTrackingEnabled)
+            if (IsChangeTrackingEnabled)
             {
-                if (this.Equals(this.Original))
+                if (Equals(Original))
                 {
-                    this.IsChanged = false;
+                    IsChanged = false;
                 }
                 else
                 {
-                    this.IsChanged = true;
+                    IsChanged = true;
                 }
             }
         }
@@ -131,9 +131,9 @@ namespace Common
         /// <param name="propertyName">Name of the property.</param>
         protected override void OnPropertyChanging([CallerMemberName] string propertyName = null)
         {
-            if (this.IsChangeTrackingEnabled)
+            if (IsChangeTrackingEnabled)
             {
-                this.BeginEdit();
+                BeginEdit();
             }
 
             base.OnPropertyChanging(propertyName);

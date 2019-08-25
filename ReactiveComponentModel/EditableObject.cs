@@ -1,11 +1,11 @@
-namespace Common
-{
-    using System;
-    using System.ComponentModel;
-    using System.Reactive;
-    using System.Reactive.Linq;
-    using System.Reactive.Subjects;
+using System;
+using System.ComponentModel;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 
+namespace ReactiveComponentModel
+{
     /// <summary>
     /// Provides functionality to commit or rollback changes to an object that is used as a data
     /// source and provide errors for the object if it is in an invalid state.
@@ -24,7 +24,7 @@ namespace Common
         /// <value>
         /// The when begin editing observable event.
         /// </value>
-        public IObservable<Unit> WhenBeginEditing => this.beginEditingSubject.AsObservable();
+        public IObservable<Unit> WhenBeginEditing => beginEditingSubject.AsObservable();
 
         /// <summary>
         /// Gets the when cancel editing observable event. Occurs when cancelling editing.
@@ -32,7 +32,7 @@ namespace Common
         /// <value>
         /// The when begin cancel observable event.
         /// </value>
-        public IObservable<Unit> WhenCancelEditing => this.cancelEditingSubject.AsObservable();
+        public IObservable<Unit> WhenCancelEditing => cancelEditingSubject.AsObservable();
 
         /// <summary>
         /// Gets the when end editing observable event. Occurs when ending editing.
@@ -40,7 +40,7 @@ namespace Common
         /// <value>
         /// The when begin end observable event.
         /// </value>
-        public IObservable<Unit> WhenEndEditing => this.endEditingSubject.AsObservable();
+        public IObservable<Unit> WhenEndEditing => endEditingSubject.AsObservable();
 
         /// <summary>
         /// Gets the original version of this object before <see cref="BeginEdit"/> was called.
@@ -67,18 +67,18 @@ namespace Common
         /// <returns>
         /// A new object that is a copy of this instance.
         /// </returns>
-        object ICloneable.Clone() => this.Clone();
+        object ICloneable.Clone() => Clone();
 
         /// <summary>
         /// Begins an edit on an object.
         /// </summary>
         public virtual void BeginEdit()
         {
-            if (this.Original == null)
+            if (Original == null)
             {
-                this.Original = this.Clone();
+                Original = Clone();
 
-                this.OnBeginEditing();
+                OnBeginEditing();
             }
         }
 
@@ -87,13 +87,13 @@ namespace Common
         /// </summary>
         public virtual void CancelEdit()
         {
-            if (this.Original != null)
+            if (Original != null)
             {
-                this.Load(this.Original);
+                Load(Original);
 
-                this.Original = null;
+                Original = null;
 
-                this.OnCancelEditing();
+                OnCancelEditing();
             }
         }
 
@@ -102,9 +102,9 @@ namespace Common
         /// </summary>
         public virtual void EndEdit()
         {
-            this.Original = null;
+            Original = null;
 
-            this.OnEndEditing();
+            OnEndEditing();
         }
 
         /// <summary>
@@ -118,24 +118,24 @@ namespace Common
         /// </summary>
         protected override void DisposeManaged()
         {
-            this.beginEditingSubject.Dispose();
-            this.cancelEditingSubject.Dispose();
-            this.endEditingSubject.Dispose();
+            beginEditingSubject.Dispose();
+            cancelEditingSubject.Dispose();
+            endEditingSubject.Dispose();
         }
 
         /// <summary>
         /// Called when editing has began.
         /// </summary>
-        protected virtual void OnBeginEditing() => this.beginEditingSubject.OnNext(Unit.Default);
+        protected virtual void OnBeginEditing() => beginEditingSubject.OnNext(Unit.Default);
 
         /// <summary>
         /// Called when editing is cancelled.
         /// </summary>
-        protected virtual void OnCancelEditing() => this.cancelEditingSubject.OnNext(Unit.Default);
+        protected virtual void OnCancelEditing() => cancelEditingSubject.OnNext(Unit.Default);
 
         /// <summary>
         /// Called when editing has ended.
         /// </summary>
-        protected virtual void OnEndEditing() => this.endEditingSubject.OnNext(Unit.Default);
+        protected virtual void OnEndEditing() => endEditingSubject.OnNext(Unit.Default);
     }
 }

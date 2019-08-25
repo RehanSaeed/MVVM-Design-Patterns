@@ -1,14 +1,13 @@
-namespace Common
-{
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Reactive.Linq;
-    using System.Runtime.CompilerServices;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Runtime.CompilerServices;
 
+namespace ReactiveComponentModel
+{
     /// <summary>
     /// Provides functionality to provide errors for the object if it is in an invalid state.
     /// </summary>
@@ -24,8 +23,8 @@ namespace Common
         /// </summary>
         event EventHandler<DataErrorsChangedEventArgs> INotifyDataErrorInfo.ErrorsChanged
         {
-            add { this.errorsChanged += value; }
-            remove { this.errorsChanged -= value; }
+            add { errorsChanged += value; }
+            remove { errorsChanged -= value; }
         }
 
 #pragma warning disable IDE1006 // Naming Styles
@@ -42,12 +41,12 @@ namespace Common
         {
             get
             {
-                this.ThrowIfDisposed();
+                ThrowIfDisposed();
 
                 return Observable
                     .FromEventPattern<DataErrorsChangedEventArgs>(
-                        h => this.errorsChanged += h,
-                        h => this.errorsChanged -= h)
+                        h => errorsChanged += h,
+                        h => errorsChanged -= h)
                     .Select(x => x.EventArgs.PropertyName);
             }
         }
@@ -58,7 +57,7 @@ namespace Common
         /// <param name="columnName">The name of the property to get errors for.</param>
         /// <value>A collection of all errors from the <see cref="IDataErrorInfo"/>. <c>null</c>
         /// if there are no errors.</value>
-        string IDataErrorInfo.this[string columnName] => string.Join(". ", this.GetErrors(columnName));
+        string IDataErrorInfo.this[string columnName] => string.Join(". ", GetErrors(columnName));
 
         /// <summary>
         /// Gets a value indicating whether the object has validation errors.
@@ -68,8 +67,8 @@ namespace Common
         {
             get
             {
-                this.InitializeErrors();
-                return this.errors.Count > 0;
+                InitializeErrors();
+                return errors.Count > 0;
             }
         }
 
@@ -92,7 +91,7 @@ namespace Common
         /// Gets the validation errors for the entire object.
         /// </summary>
         /// <returns>A collection of errors.</returns>
-        public IEnumerable GetErrors() => this.GetErrors(null);
+        public IEnumerable GetErrors() => GetErrors(null);
 
         /// <summary>
         /// Gets the validation errors for a specified property or for the entire object.
@@ -102,18 +101,13 @@ namespace Common
         /// <returns>A collection of errors.</returns>
         public IEnumerable GetErrors(string propertyName)
         {
-            Debug.Assert(
-                string.IsNullOrEmpty(propertyName) ||
-                (this.GetType().GetProperty(propertyName) != null),
-                "Check that the property name exists for this instance.");
-
-            this.InitializeErrors();
+            InitializeErrors();
 
             IEnumerable result;
             if (string.IsNullOrEmpty(propertyName))
             {
                 var allErrors = new List<object>();
-                foreach (var keyValuePair in this.errors)
+                foreach (var keyValuePair in errors)
                 {
                     allErrors.AddRange(keyValuePair.Value);
                 }
@@ -122,9 +116,9 @@ namespace Common
             }
             else
             {
-                if (this.errors.ContainsKey(propertyName))
+                if (errors.ContainsKey(propertyName))
                 {
-                    result = this.errors[propertyName];
+                    result = errors[propertyName];
                 }
                 else
                 {
@@ -145,11 +139,11 @@ namespace Common
 
             if (string.IsNullOrEmpty(propertyName))
             {
-                this.ApplyRules();
+                ApplyRules();
             }
             else
             {
-                this.ApplyRules(propertyName);
+                ApplyRules(propertyName);
             }
 
             base.OnPropertyChanged(HasErrorsPropertyName);
@@ -161,12 +155,7 @@ namespace Common
         /// <param name="propertyName">Name of the property.</param>
         protected virtual void OnErrorsChanged([CallerMemberName] string propertyName = null)
         {
-            Debug.Assert(
-                string.IsNullOrEmpty(propertyName) ||
-                (this.GetType().GetProperty(propertyName) != null),
-                "Check that the property name exists for this instance.");
-
-            this.errorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+            errorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
 
         /// <summary>
@@ -174,11 +163,11 @@ namespace Common
         /// </summary>
         private void ApplyRules()
         {
-            this.InitializeErrors();
+            InitializeErrors();
 
             foreach (var propertyName in Rules.Select(x => x.PropertyName))
             {
-                this.ApplyRules(propertyName);
+                ApplyRules(propertyName);
             }
         }
 
@@ -188,27 +177,27 @@ namespace Common
         /// <param name="propertyName">Name of the property.</param>
         private void ApplyRules(string propertyName)
         {
-            this.InitializeErrors();
+            InitializeErrors();
 
             var propertyErrors = Rules.Apply((T)this, propertyName).ToList();
             if (propertyErrors.Count > 0)
             {
-                if (this.errors.ContainsKey(propertyName))
+                if (errors.ContainsKey(propertyName))
                 {
-                    this.errors[propertyName].Clear();
+                    errors[propertyName].Clear();
                 }
                 else
                 {
-                    this.errors[propertyName] = new List<object>();
+                    errors[propertyName] = new List<object>();
                 }
 
-                this.errors[propertyName].AddRange(propertyErrors);
-                this.OnErrorsChanged(propertyName);
+                errors[propertyName].AddRange(propertyErrors);
+                OnErrorsChanged(propertyName);
             }
-            else if (this.errors.ContainsKey(propertyName))
+            else if (errors.ContainsKey(propertyName))
             {
-                this.errors.Remove(propertyName);
-                this.OnErrorsChanged(propertyName);
+                errors.Remove(propertyName);
+                OnErrorsChanged(propertyName);
             }
         }
 
@@ -217,11 +206,11 @@ namespace Common
         /// </summary>
         private void InitializeErrors()
         {
-            if (this.errors == null)
+            if (errors == null)
             {
-                this.errors = new Dictionary<string, List<object>>();
+                errors = new Dictionary<string, List<object>>();
 
-                this.ApplyRules();
+                ApplyRules();
             }
         }
     }

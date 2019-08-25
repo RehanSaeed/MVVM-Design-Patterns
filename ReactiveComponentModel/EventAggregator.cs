@@ -1,9 +1,9 @@
-namespace Common
-{
-    using System;
-    using System.Collections.Concurrent;
-    using System.Reactive.Subjects;
+using System;
+using System.Collections.Concurrent;
+using System.Reactive.Subjects;
 
+namespace ReactiveComponentModel
+{
     /// <inheritdoc />
     public class EventAggregator : Disposable, IEventAggregator
     {
@@ -11,12 +11,12 @@ namespace Common
 
         /// <inheritdoc />
         public IObservable<TEvent> GetEvent<TEvent>() =>
-            (ISubject<TEvent>)this.subjects.GetOrAdd(typeof(TEvent), x => new Subject<TEvent>());
+            (ISubject<TEvent>)subjects.GetOrAdd(typeof(TEvent), x => new Subject<TEvent>());
 
         /// <inheritdoc />
         public void Publish<TEvent>(TEvent eventValue)
         {
-            if (this.subjects.TryGetValue(typeof(TEvent), out var subject))
+            if (subjects.TryGetValue(typeof(TEvent), out var subject))
             {
                 ((ISubject<TEvent>)subject).OnNext(eventValue);
             }
@@ -25,7 +25,7 @@ namespace Common
         /// <inheritdoc />
         protected override void DisposeManaged()
         {
-            foreach (var item in this.subjects)
+            foreach (var item in subjects)
             {
                 if (item.Value is IDisposable disposable)
                 {

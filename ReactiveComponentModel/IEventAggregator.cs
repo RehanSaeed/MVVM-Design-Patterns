@@ -1,7 +1,7 @@
-namespace Common
-{
-    using System;
+using System;
 
+namespace ReactiveComponentModel
+{
     /// <summary>
     /// Channels events from multiple objects into a single object to simplify registration for clients.
     /// </summary>

@@ -1,7 +1,7 @@
-namespace Common
-{
-    using System;
+using System;
 
+namespace ReactiveComponentModel
+{
     /// <summary>
     /// Produces deep clones of objects.
     /// </summary>

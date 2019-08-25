@@ -1,7 +1,7 @@
-namespace Common
-{
-    using System;
+using System;
 
+namespace ReactiveComponentModel
+{
     /// <summary>
     /// A named rule containing an error to be used if the rule fails.
     /// </summary>
@@ -9,14 +9,14 @@ namespace Common
     public abstract class Rule<T>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Rule&lt;T&gt;"/> class.
+        /// Initializes a new instance of the <see cref="Rule{T}"/> class.
         /// </summary>
         /// <param name="propertyName">The name of the property this instance applies to.</param>
         /// <param name="error">The error message if the rules fails.</param>
         protected Rule(string propertyName, object error)
         {
-            this.PropertyName = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
-            this.Error = error ?? throw new ArgumentNullException(nameof(error));
+            PropertyName = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
+            Error = error ?? throw new ArgumentNullException(nameof(error));
         }
 
         /// <summary>
