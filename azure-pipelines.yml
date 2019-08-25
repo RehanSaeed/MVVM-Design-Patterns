@@ -1,0 +1,54 @@
+# .NET Core
+# Build and run tests for .NET Core projects
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  publishProject: 'ReactiveComponentModel'
+  buildConfiguration: 'Release'
+
+steps:
+- checkout: self
+  submodules: recursive
+
+- task: UseDotNet@2
+  displayName: 'Use .NET Core 3.x'
+  inputs:
+    version: 3.x
+    includePreviewVersions: true
+
+- task: DotNetCoreCLI@2
+  displayName: Restore
+  inputs:
+    command: restore
+
+- task: DotNetCoreCLI@2
+  displayName: Build
+  inputs:
+    command: build
+    arguments: '-c $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: Publish
+  inputs:
+    command: publish
+    projects: '$(publishProject)'
+    arguments: '-c $(buildConfiguration)'
+    publishWebProjects: false
+    zipAfterPublish: false
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)'
+    Contents: '$(publishProject)/bin/$(buildConfiguration)/**/publish/?(*.exe|*.dll|*.pdb)'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    FlattenFolders: true
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(Build.ArtifactStagingDirectory)'
+    artifact: '$(buildConfiguration)'
