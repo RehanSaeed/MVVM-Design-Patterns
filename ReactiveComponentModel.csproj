@@ -1,6 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <PackageId>ReactiveComponentModel</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Herohtar</Authors>
+    <Description>An implementation of several System.ComponentModel interfaces designed to work with MVVM and System.Reactive</Description>
+    <Copyright>Copyright © 2019 Herohtar</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageTags>MVVM;Reactive;ComponentModel;</PackageTags>
+    <RepositoryUrl>https://github.com/Herohtar/ReactiveComponentModel</RepositoryUrl>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
