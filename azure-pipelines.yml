@@ -1,5 +1,5 @@
-# .NET Core
-# Build and run tests for .NET Core projects
+# .NET Core NuGet Package
+# Build and publish .NET Core NuGet package projects
 
 trigger:
 - master
@@ -30,25 +30,16 @@ steps:
   displayName: Build
   inputs:
     command: build
-    arguments: '-c $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
-  displayName: Publish
+  displayName: Pack
   inputs:
-    command: publish
-    projects: '$(publishProject)'
-    arguments: '-c $(buildConfiguration)'
-    publishWebProjects: false
-    zipAfterPublish: false
+    command: pack
+#    packagesToPack: '$(publishProject)'
 
-- task: CopyFiles@2
+- task: DotNetCoreCLI@2
+  displayName: Push
   inputs:
-    SourceFolder: '$(Build.SourcesDirectory)'
-    Contents: '$(publishProject)/bin/$(buildConfiguration)/**/publish/?(*.exe|*.dll|*.pdb)'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
-    FlattenFolders: true
-
-- task: PublishPipelineArtifact@1
-  inputs:
-    targetPath: '$(Build.ArtifactStagingDirectory)'
-    artifact: '$(buildConfiguration)'
+    command: push
+    nuGetFeedType: external
+    publishFeedCredentials: 'NuGet'
