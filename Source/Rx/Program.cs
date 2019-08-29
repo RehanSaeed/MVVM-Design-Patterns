@@ -4,7 +4,6 @@ namespace Rx
     using System.Collections.Generic;
     using System.Reactive.Linq;
     using System.Reactive.Subjects;
-    using System.Threading.Tasks;
     using Common;
     using DryIoc;
 
@@ -48,7 +47,7 @@ namespace Rx
     {
         public event EventHandler<NewMessageEventArgs> NewMessage;
 
-        public void RaiseNewMessage(string text) => this.NewMessage.Invoke(this, new NewMessageEventArgs(text));
+        public void RaiseNewMessage(string text) => this.NewMessage?.Invoke(this, new NewMessageEventArgs(text));
     }
 
     public class CSharpEventSubscriberViewModel : Disposable
