@@ -37,13 +37,17 @@ namespace EventAggregatorPattern
         public void NewMessage(string text) => this.eventAggregator.Publish(new NewMessageEvent(text));
     }
 
-    public class SubscriberViewModel
+    public class SubscriberViewModel : Disposable
     {
+        private readonly IDisposable newMessageSubscription;
+
         public SubscriberViewModel(IEventAggregator eventAggregator) =>
-            eventAggregator
+            this.newMessageSubscription = eventAggregator
                 .GetEvent<NewMessageEvent>()
                 // .ObserveOnDispatcher()
                 .Subscribe(this.OnNewMessage);
+
+        protected override void DisposeManaged() => this.newMessageSubscription.Dispose();
 
         private void OnNewMessage(NewMessageEvent newMessageEvent) => Console.WriteLine(newMessageEvent.Text);
     }

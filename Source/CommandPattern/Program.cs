@@ -2,11 +2,19 @@ namespace CommandPattern
 {
     using System;
     using System.Threading.Tasks;
+    using System.Windows.Input;
     using Common;
     using Common.Commands;
     using Common.Services;
     using DryIoc;
 
+    /// <summary>
+    /// See <see cref="ICommand"/>.
+    /// </summary>
+    /// <example>
+    /// Command="{Binding Foo}"
+    /// CommandParameter="{Binding Bar}"
+    /// </example>
     public class Program
     {
         public static async Task Main()

@@ -15,7 +15,7 @@ namespace ViewModelComposition
             container.Register<IService2, Service2>();
             container.Register<IService3, Service3>();
             container.Register<MessageViewModel>();
-            container.Register<TextViewModel>();
+            container.Register<InputViewModel>();
             container.Register<ConversationViewModel>();
 
             var conversationViewModel = container.Resolve<ConversationViewModel>();
@@ -31,20 +31,20 @@ namespace ViewModelComposition
         private readonly IService1 service1;
 
         public ConversationViewModel(
-            TextViewModel textViewModel,
+            InputViewModel inputViewModel,
             Func<MessageViewModel> messageViewModelFactory,
             IService1 service1)
         {
-            this.Text = textViewModel;
+            this.Input = inputViewModel;
             this.messageViewModelFactory = messageViewModelFactory;
             this.service1 = service1;
 
             this.Messages = new ObservableCollection<MessageViewModel>();
         }
 
-        public ObservableCollection<MessageViewModel> Messages { get; }
+        public InputViewModel Input { get; }
 
-        public TextViewModel Text { get; }
+        public ObservableCollection<MessageViewModel> Messages { get; }
 
         public void AddMessage(string text)
         {
@@ -54,13 +54,13 @@ namespace ViewModelComposition
         }
     }
 
-    public class TextViewModel : NotifyPropertyChanges
+    public class InputViewModel : NotifyPropertyChanges
     {
         private readonly IService2 service2;
 
         private string text;
 
-        public TextViewModel(IService2 service2) => this.service2 = service2;
+        public InputViewModel(IService2 service2) => this.service2 = service2;
 
         public string Text
         {
